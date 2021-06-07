@@ -6,9 +6,9 @@ import urllib.parse
 import base64
 
 from rest_framework import status, generics
-from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus
+from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser
 from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, \
-    AddressBookListSerializer, PoolStatusSerializer
+    AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
@@ -102,7 +102,25 @@ def get_pool_status(request):
     return Response(serializer_class.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def subuser_exist(request):
+    input_subuser_name = request.GET['name']
+    queryset = Subuser.objects.filter(name=input_subuser_name)
+    serializer_class = SubuserExistSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['GET'])
+def check_permission(request):
+    input_subuser_name = request.GET['name']
+    hardcode_return_data = {
+        "viewPermission": True,
+        "billPermission": True
+    }
+    return Response(hardcode_return_data, status=status.HTTP_200_OK)
 
 # ============== suppoet function =================
 def pad(s):

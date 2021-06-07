@@ -68,3 +68,21 @@ class PoolStatusSerializer(serializers.ModelSerializer):
         currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
         return currency_pool_status.workers
 
+
+class SubuserExistSerializer(serializers.ModelSerializer):
+    """
+    Create this serializer only for subuser check
+    In case code conflict, add this serializer with key word "Exist"
+    """
+    class Meta:
+        model = Subuser
+        fields = ['name']
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    """
+    Not ready for this API yet. DB missing data.
+    Based on the meeting on 06/06/2021, at this point only return True to all permissions
+    """
+    class Meta:
+        fields = ['viewPermission', 'billPermission']

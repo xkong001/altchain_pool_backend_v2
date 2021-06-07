@@ -23,5 +23,7 @@ urlpatterns = [
     path('api/user/register/', views.user_register),
     path('api/user/modifyPwdByEmail/', views.user_register),
     path('api/user/addressBook/getAddressBookListWithWithdrawPercent/', views.get_address_book_list),
-    path('api/v1/pool/stats/', views.get_pool_status)
+    path('api/v1/pool/stats/', views.get_pool_status),
+    path('api/v1/accountMining/checkExist/', views.subuser_exist),
+    path('api/v1/accountMining/checkPermissions/', views.check_permission)
 ]
