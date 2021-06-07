@@ -6,8 +6,9 @@ import urllib.parse
 import base64
 
 from rest_framework import status, generics
-from quickstart.models import AddressWhiteList, EmailCode
-from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, AddressBookListSerializer
+from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus
+from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, \
+    AddressBookListSerializer, PoolStatusSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
@@ -39,7 +40,7 @@ def modify_withdraw_percent(request):
     """
     account_id = request.data.get('accountId')
     currency = request.data.get('currency')
-    queryset = AddressWhiteList.objects.filter(user_uuid=account_id, currency=currency)
+    queryset = AddressWhiteList.objects.filter(currency=currency)
     serializer_class = AddressBookSerializer(queryset, many=True)
     return Response(serializer_class.data, status=status.HTTP_200_OK)
 
@@ -92,6 +93,15 @@ def get_address_book_list(request):
     queryset = AddressWhiteList.objects.filter(currency=input_currency)
     serializer_class = AddressBookListSerializer(queryset, many=True)
     return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_pool_status(request):
+    queryset = CurrencyStatus.objects.all()
+    serializer_class = PoolStatusSerializer(queryset, many=True)
+    return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
 
 
 # ============== suppoet function =================

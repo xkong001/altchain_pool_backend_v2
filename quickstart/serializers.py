@@ -16,9 +16,8 @@ class EmailCodeSerializer(serializers.ModelSerializer):
 
 
 class AddressBookSerializer(serializers.ModelSerializer):
-    #subuser_payment_address = serializers.PrimaryKeyRelatedField(
-    #    queryset=SubuserPaymentAddress.objects.all())
-    subuser_payment_address = serializers.StringRelatedField(many=True)
+    subuser_payment_address = serializers.PrimaryKeyRelatedField(
+        queryset=SubuserPaymentAddress.objects.all())
 
     class Meta:
         model = AddressWhiteList
@@ -37,6 +36,35 @@ class AddressBookListSerializer(serializers.ModelSerializer):
         fields = ['user_uuid', 'address', 'currency', 'ext_data', 'gmt_update']
 
 
+class PoolStatusSerializer(serializers.ModelSerializer):
+    blocks = serializers.SerializerMethodField()
+    hashrate = serializers.SerializerMethodField()
+    miners = serializers.SerializerMethodField()
+    workers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CurrencyStatus
+        fields = ['currency', 'income', 'mean_income_24h', 'income_hashrate', 'usd',
+                  'cny', 'network_hashrate', 'blocks', 'hashrate', 'miners', 'workers']
 
 
+    @staticmethod
+    def get_blocks(obj):
+        currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
+        return currency_pool_status.blocks
+
+    @staticmethod
+    def get_hashrate(obj):
+        currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
+        return currency_pool_status.hashrate
+
+    @staticmethod
+    def get_miners(obj):
+        currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
+        return currency_pool_status.miners
+
+    @staticmethod
+    def get_workers(obj):
+        currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
+        return currency_pool_status.workers
 
