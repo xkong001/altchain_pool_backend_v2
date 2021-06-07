@@ -6,9 +6,9 @@ import urllib.parse
 import base64
 
 from rest_framework import status, generics
-from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser
+from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser, User
 from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, \
-    AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer
+    AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer, UserConfigSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
@@ -121,6 +121,21 @@ def check_permission(request):
         "billPermission": True
     }
     return Response(hardcode_return_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_all_config(request):
+    """
+    This function do not have any input due to frontend security.
+    Hard code a test user uuid below for dev/test
+    """
+    user_uuid = '1234567890123456'
+    queryset = User.objects.filter(uuid=user_uuid)
+    serializer_class = UserConfigSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 # ============== suppoet function =================
 def pad(s):

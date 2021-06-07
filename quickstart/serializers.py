@@ -47,7 +47,6 @@ class PoolStatusSerializer(serializers.ModelSerializer):
         fields = ['currency', 'income', 'mean_income_24h', 'income_hashrate', 'usd',
                   'cny', 'network_hashrate', 'blocks', 'hashrate', 'miners', 'workers']
 
-
     @staticmethod
     def get_blocks(obj):
         currency_pool_status = CurrencyPoolStatus.objects.get(currency=obj.currency)
@@ -74,6 +73,7 @@ class SubuserExistSerializer(serializers.ModelSerializer):
     Create this serializer only for subuser check
     In case code conflict, add this serializer with key word "Exist"
     """
+
     class Meta:
         model = Subuser
         fields = ['name']
@@ -84,5 +84,23 @@ class PermissionSerializer(serializers.ModelSerializer):
     Not ready for this API yet. DB missing data.
     Based on the meeting on 06/06/2021, at this point only return True to all permissions
     """
+
     class Meta:
         fields = ['viewPermission', 'billPermission']
+
+
+class FollowWalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FollowWallet
+        fields = ['uuid', 'wallet']
+
+
+class UserConfigSerializer(serializers.ModelSerializer):
+    """
+    Get all user config
+    """
+    follow_wallet = FollowWalletSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['uuid', 'follow_wallet']
