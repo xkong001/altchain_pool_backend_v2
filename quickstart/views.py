@@ -1,11 +1,19 @@
+import hashlib
+import os
 import time
+import uuid
 import urllib.parse
+import base64
 
-from rest_framework import status
-from quickstart.serializers import EmailCodeSerializer
+from rest_framework import status, generics
+from quickstart.models import AddressWhiteList, EmailCode
+from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, AddressBookListSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
+from Crypto.Cipher import AES
+from Crypto import Random
+
 
 @api_view(['POST'])
 def email_code_gen(request):
@@ -23,3 +31,72 @@ def email_code_gen(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def modify_withdraw_percent(request):
+    """
+    modify withdraw percent with given account id and currency
+    """
+    account_id = request.data.get('accountId')
+    currency = request.data.get('currency')
+    queryset = AddressWhiteList.objects.filter(user_uuid=account_id, currency=currency)
+    serializer_class = AddressBookSerializer(queryset, many=True)
+    return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def user_register(request):
+    """
+    register for login user
+    Note:
+    As talked on 06/07/2021, register need check email code. email code has expiration time.
+    This expiration time not defined yet. In here, API do not check the code expiration time.
+    """
+    new_user_email = request.data.get('email')
+    new_user_code = request.data.get('emailCode')
+    new_user_pwd = request.data.get('pwd')
+
+    # uuid - 16 bit gen
+    new_uuid = uuid.uuid1().bytes
+
+    # encode given pwd
+    iv = Random.new().read(AES.block_size)
+    private_key = pad("The private key")
+    aes = AES.new(private_key.encode("utf8"), AES.MODE_CBC, iv)
+    cipher_passwd = aes.encrypt(pad(new_user_pwd).encode("utf8"))
+
+    # check email code:
+    stored_email_code = EmailCode.objects.filter(email=new_user_email).first().code
+
+
+    # ===============check expiration time =====================
+    #                          TBD
+    # ==========================================================
+
+    # check code
+    if stored_email_code == new_user_code:
+        serializer_data = {'uuid': new_uuid,
+                           'email': new_user_email,
+                           'password': str(cipher_passwd)
+                           }
+        serializer = UserSerializer(data=serializer_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_address_book_list(request):
+    input_currency = request.GET['currency']
+    queryset = AddressWhiteList.objects.filter(currency=input_currency)
+    serializer_class = AddressBookListSerializer(queryset, many=True)
+    return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+# ============== suppoet function =================
+def pad(s):
+    block_size = 16
+    remainder = len(s) % block_size
+    padding_needed = block_size - remainder
+    return s + padding_needed * ' '

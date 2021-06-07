@@ -18,5 +18,9 @@ from django.urls import path
 from quickstart import views
 
 urlpatterns = [
-    path('api/email/sendEmailCodeGt/', views.email_code_gen)
+    path('api/email/sendEmailCodeGt/', views.email_code_gen),
+    path('api/user/addressBook/batchModifyWithdrawPercent/', views.modify_withdraw_percent),
+    path('api/user/register/', views.user_register),
+    path('api/user/modifyPwdByEmail/', views.user_register),
+    path('api/user/addressBook/getAddressBookListWithWithdrawPercent', views.get_address_book_list)
 ]
