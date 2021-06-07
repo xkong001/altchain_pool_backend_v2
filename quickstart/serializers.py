@@ -141,3 +141,15 @@ class ObserverAccountSerializer(serializers.ModelSerializer):
     def get_img_url(obj):
         sub_user = Subuser.objects.get(uuid=obj.subuser_uuid)
         return sub_user.img_url
+
+
+class CreateMiningAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subuser
+        fields = ['name']
+
+
+class GetDefaultMinerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DefaultMiner
+        fields = ['subuser_uuid', 'currency']

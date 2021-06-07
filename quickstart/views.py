@@ -6,10 +6,10 @@ import urllib.parse
 import base64
 
 from rest_framework import status, generics
-from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser, User, SubuserObserver
+from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser, User, SubuserObserver, DefaultMiner
 from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, \
     AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer, UserConfigSerializer, \
-    MiningAccountSerializer, ObserverAccountSerializer
+    MiningAccountSerializer, ObserverAccountSerializer, CreateMiningAccountSerializer, GetDefaultMinerSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
@@ -167,6 +167,35 @@ def get_observer_account(request):
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['GET'])
+def mining_account_createable(request):
+    """
+    As talked on 06/07/2021, we can not set this function to work
+    at this point all subuser account will return True for this API
+    """
+    input_subuser_name = request.GET['name']
+    queryset = Subuser.objects.filter(name=input_subuser_name)
+    serializer_class = CreateMiningAccountSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response({'data': True}, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_default_miner(request):
+    """
+    This function do not have any input due to frontend security.
+    Hard code a test user uuid below for dev/test
+    """
+    user_uuid = '1234567890123456'
+    queryset = DefaultMiner.objects.filter(user_uuid=user_uuid)
+    serializer_class = GetDefaultMinerSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 # ============== suppoet function =================
 def pad(s):

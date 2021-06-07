@@ -28,5 +28,10 @@ urlpatterns = [
     path('api/v1/accountMining/checkPermissions/', views.check_permission),
     path('api/v1/config/getConfigs/', views.get_all_config),
     path('api/v1/accountMining/list/', views.get_mining_account),
-    path('api/v1/observer/list/', views.get_observer_account)
+    path('api/v1/observer/list/', views.get_observer_account),
+    path('api/v1/accountMining/createable/', views.mining_account_createable),
+    path('api/v1/config/getDefaultMiner/', views.get_default_miner)
 ]
+
+
+
