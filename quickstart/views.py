@@ -6,9 +6,10 @@ import urllib.parse
 import base64
 
 from rest_framework import status, generics
-from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser, User
+from quickstart.models import AddressWhiteList, EmailCode, CurrencyStatus, Subuser, User, SubuserObserver
 from quickstart.serializers import EmailCodeSerializer, AddressBookSerializer, UserSerializer, \
-    AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer, UserConfigSerializer
+    AddressBookListSerializer, PoolStatusSerializer, SubuserExistSerializer, UserConfigSerializer, \
+    MiningAccountSerializer, ObserverAccountSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from random import randint
@@ -69,7 +70,6 @@ def user_register(request):
     # check email code:
     stored_email_code = EmailCode.objects.filter(email=new_user_email).first().code
 
-
     # ===============check expiration time =====================
     #                          TBD
     # ==========================================================
@@ -122,6 +122,7 @@ def check_permission(request):
     }
     return Response(hardcode_return_data, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def get_all_config(request):
     """
@@ -131,6 +132,36 @@ def get_all_config(request):
     user_uuid = '1234567890123456'
     queryset = User.objects.filter(uuid=user_uuid)
     serializer_class = UserConfigSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_mining_account(request):
+    """
+    This function do not have any input due to frontend security.
+    Hard code a test user uuid below for dev/test
+    """
+    user_uuid = '1234567890123456'
+    queryset = Subuser.objects.filter(user_uuid=user_uuid)
+    serializer_class = MiningAccountSerializer(queryset, many=True)
+    if serializer_class.data:
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_observer_account(request):
+    """
+    This function do not have any input due to frontend security.
+    Hard code a test user uuid below for dev/test
+    """
+    user_uuid = '1234567890123456'
+    queryset = SubuserObserver.objects.filter(observer_user_uuid=user_uuid)
+    serializer_class = ObserverAccountSerializer(queryset, many=True)
     if serializer_class.data:
         return Response(serializer_class.data, status=status.HTTP_200_OK)
     else:

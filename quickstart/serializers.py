@@ -104,3 +104,40 @@ class UserConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['uuid', 'follow_wallet']
+
+
+class MiningAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subuser
+        fields = '__all__'
+
+
+class ObserverAccountSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    memo = serializers.SerializerMethodField()
+    account_stat = serializers.SerializerMethodField()
+    img_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SubuserObserver
+        fields = ['subuser_uuid', 'name', 'memo', 'account_stat', 'img_url']
+
+    @staticmethod
+    def get_name(obj):
+        sub_user = Subuser.objects.get(uuid=obj.subuser_uuid)
+        return sub_user.name
+
+    @staticmethod
+    def get_memo(obj):
+        sub_user = Subuser.objects.get(uuid=obj.subuser_uuid)
+        return sub_user.memo
+
+    @staticmethod
+    def get_account_stat(obj):
+        sub_user = Subuser.objects.get(uuid=obj.subuser_uuid)
+        return sub_user.account_stat
+
+    @staticmethod
+    def get_img_url(obj):
+        sub_user = Subuser.objects.get(uuid=obj.subuser_uuid)
+        return sub_user.img_url
